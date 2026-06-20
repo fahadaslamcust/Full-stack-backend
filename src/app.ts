@@ -4,6 +4,10 @@ import { HTTP_STATUS } from "./constants/httpStatus";
 import { AppError } from "./utils/AppError";
 import { errorHandler } from "./middlewares/errorHandler.middleware";
 
+// Route Imports
+import authRoutes from "./routes/auth.routes";
+import userRoutes from "./routes/user.routes";
+
 const app = express();
 
 // Global Middlewares
@@ -14,6 +18,10 @@ app.use(express.json()); // Allows Express to read incoming JSON data bodies
 app.get("/health", (req: Request, res: Response) => {
   res.status(HTTP_STATUS.OK).json({ status: "healthy", timestamp: new Date() });
 });
+
+// Main Root Endpoint Setup
+app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/users", userRoutes);
 
 // Catch-All Route for routes that don't exist
 app.all("/*splat", (req: Request, res: Response, next: NextFunction) => {
