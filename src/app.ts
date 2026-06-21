@@ -7,6 +7,7 @@ import { errorHandler } from "./middlewares/errorHandler.middleware";
 // Route Imports
 import authRoutes from "./routes/auth.routes";
 import userRoutes from "./routes/user.routes";
+import postRoutes from "./routes/post.routes";
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.get("/health", (req: Request, res: Response) => {
 // Main Root Endpoint Setup
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/posts", postRoutes);
 
 // Catch-All Route for routes that don't exist
 app.all("/*splat", (req: Request, res: Response, next: NextFunction) => {

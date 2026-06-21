@@ -2,6 +2,7 @@ import { Schema, model, Document } from "mongoose";
 import bcrypt from "bcryptjs";
 
 export interface IUser extends Document {
+  id: string;
   name: string;
   email: string;
   password?: string;
@@ -53,5 +54,10 @@ userSchema.methods.correctPassword = async function (
 ): Promise<boolean> {
   return await bcrypt.compare(candidatePassword, userPassword);
 };
+
+// Virtual getter to convert id into STRING
+userSchema.virtual("id").get(function () {
+  return this._id.toHexString();
+});
 
 export default model<IUser>("User", userSchema);
