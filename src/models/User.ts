@@ -1,4 +1,4 @@
-import { Schema, model, Document } from "mongoose";
+import { Schema, model, Document, Types } from "mongoose";
 import bcrypt from "bcryptjs";
 
 export interface IUser extends Document {
@@ -7,6 +7,8 @@ export interface IUser extends Document {
   email: string;
   password?: string;
   bio: string;
+  followers: Types.ObjectId[];
+  following: Types.ObjectId[];
   avatar: string;
   correctPassword(
     candidatePassword: string,
@@ -30,6 +32,8 @@ const userSchema = new Schema<IUser>(
       select: false, // Hides password
     },
     bio: { type: String, default: "", maxlength: 250 },
+    followers: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    following: [{ type: Schema.Types.ObjectId, ref: "User" }],
     avatar: {
       type: String,
       default:
