@@ -16,6 +16,23 @@ export const createPost = async (
   }
 };
 
+export const updatePost = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const post = await postService.updatePost(
+      req.params.id.toString(),
+      req.user!.id,
+      req.body.content,
+    );
+    res.status(HTTP_STATUS.OK).json({ success: true, data: post });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getFeed = async (
   req: AuthenticatedRequest,
   res: Response,

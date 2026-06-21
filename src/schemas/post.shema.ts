@@ -9,6 +9,12 @@ export const createPostSchema = z.object({
   }),
 });
 
+export const updatePostSchema = z.object({
+  body: z.object({
+    content: z.string().min(1).max(2000),
+  }),
+});
+
 export const createCommentSchema = z.object({
   body: z.object({
     text: z

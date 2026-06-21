@@ -2,7 +2,7 @@ import { Router } from "express";
 import * as eventController from "../controllers/event.controller";
 import { protect } from "../middlewares/auth.middleware";
 import { validate } from "../middlewares/validate.middleware";
-import { createEventSchema } from "../schemas/event.schema";
+import { createEventSchema, updateEventSchema } from "../schemas/event.schema";
 
 const router = Router();
 
@@ -16,6 +16,7 @@ router
 router
   .route("/:id")
   .get(eventController.getEvent)
+  .put(validate(updateEventSchema), eventController.updateEvent)
   .delete(eventController.deleteEvent);
 
 router.post("/:id/rsvp", eventController.rsvpEvent);

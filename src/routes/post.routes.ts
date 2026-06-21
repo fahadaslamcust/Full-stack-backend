@@ -2,7 +2,11 @@ import { Router } from "express";
 import * as postController from "../controllers/post.controller";
 import { protect } from "../middlewares/auth.middleware";
 import { validate } from "../middlewares/validate.middleware";
-import { createPostSchema, createCommentSchema } from "../schemas/post.shema";
+import {
+  createPostSchema,
+  createCommentSchema,
+  updatePostSchema,
+} from "../schemas/post.shema";
 
 const router = Router();
 
@@ -18,6 +22,7 @@ router
 router
   .route("/:id")
   .get(postController.getPost)
+  .put(validate(updatePostSchema), postController.updatePost)
   .delete(postController.deletePost);
 
 router.post("/:id/like", postController.toggleLike);

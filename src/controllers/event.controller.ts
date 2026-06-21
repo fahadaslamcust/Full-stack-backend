@@ -16,6 +16,23 @@ export const createEvent = async (
   }
 };
 
+export const updateEvent = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const event = await eventService.updateEvent(
+      req.params.id.toString(),
+      req.user!.id,
+      req.body,
+    );
+    res.status(HTTP_STATUS.OK).json({ success: true, data: event });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getEvents = async (
   req: AuthenticatedRequest,
   res: Response,

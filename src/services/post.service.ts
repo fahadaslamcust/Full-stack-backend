@@ -8,6 +8,27 @@ export const createPost = async (userId: string, data: CreatePostInput) => {
   return await post.populate("author", "name avatar");
 };
 
+export const updatePost = async (
+  postId: string,
+  userId: string,
+  content: string,
+) => {
+  const post = await Post.findById(postId);
+  if (!post) throw new AppError("Post not found", HTTP_STATUS.NOT_FOUND);
+
+  if (post.author.toString() !== userId) {
+    throw new AppError(
+      "You can only edit your own posts",
+      HTTP_STATUS.FORBIDDEN,
+    );
+  }
+
+  post.content = content;
+  post.isEdited = true; // Flag it as edited
+  await post.save();
+  return post;
+};
+
 export const getFeed = async (page: number = 1, limit: number = 10) => {
   const skip = (page - 1) * limit;
   return await Post.find()

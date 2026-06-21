@@ -2,6 +2,7 @@ import Event from "../models/Event";
 import { AppError } from "../utils/AppError";
 import { HTTP_STATUS } from "../constants/httpStatus";
 import { CreateEventInput } from "../schemas/event.schema";
+import { UpdateEventInput } from "../schemas/event.schema";
 
 export const createEvent = async (userId: string, data: CreateEventInput) => {
   const event = await Event.create({
@@ -10,6 +11,27 @@ export const createEvent = async (userId: string, data: CreateEventInput) => {
     attendees: [userId], // The organizer is attending by default!
   });
   return await event.populate("organizer", "name avatar");
+};
+
+export const updateEvent = async (
+  eventId: string,
+  userId: string,
+  data: UpdateEventInput,
+) => {
+  const event = await Event.findById(eventId);
+  if (!event) throw new AppError("Event not found", HTTP_STATUS.NOT_FOUND);
+
+  if (event.organizer.toString() !== userId) {
+    throw new AppError(
+      "You can only edit events you organized",
+      HTTP_STATUS.FORBIDDEN,
+    );
+  }
+
+  // Object.assign safely updates only the fields provided in 'data'
+  Object.assign(event, data);
+  await event.save();
+  return event;
 };
 
 export const getUpcomingEvents = async (
