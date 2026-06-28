@@ -2,6 +2,8 @@ import Post from "../models/Post";
 import { AppError } from "../utils/AppError";
 import { HTTP_STATUS } from "../constants/httpStatus";
 import { CreatePostInput, CreateCommentInput } from "../schemas/post.shema";
+import { createNotification } from "./notification.service";
+import { NotificationType } from "../models/Notification";
 
 export const createPost = async (userId: string, data: CreatePostInput) => {
   const post = await Post.create({ author: userId, content: data.content });
@@ -80,6 +82,15 @@ export const toggleLike = async (postId: string, userId: string) => {
   }
 
   await post.save();
+
+  // LIKE Notification
+  await createNotification(
+    post.author.toString(),
+    userId,
+    NotificationType.LIKE,
+    post._id.toString() as string,
+  );
+
   return post;
 };
 
@@ -98,6 +109,15 @@ export const addComment = async (
   });
 
   await post.save();
+
+  // Notification
+  await createNotification(
+    post.author.toString(),
+    userId,
+    NotificationType.COMMENT,
+    post._id.toString() as string,
+  );
+
   // Return the post with the newly added user populated
   return await post.populate("comments.user", "name avatar");
 };

@@ -3,6 +3,8 @@ import { AppError } from "../utils/AppError";
 import { HTTP_STATUS } from "../constants/httpStatus";
 import { CreateEventInput } from "../schemas/event.schema";
 import { UpdateEventInput } from "../schemas/event.schema";
+import { createNotification } from "./notification.service";
+import { NotificationType } from "../models/Notification";
 
 export const createEvent = async (userId: string, data: CreateEventInput) => {
   const event = await Event.create({
@@ -31,6 +33,15 @@ export const updateEvent = async (
   // Object.assign safely updates only the fields provided in 'data'
   Object.assign(event, data);
   await event.save();
+
+  // Notify the event organizer that someone RSVP'd
+  await createNotification(
+    event.organizer.toString(),
+    userId,
+    NotificationType.EVENT_RSVP,
+    event._id.toString() as string,
+  );
+
   return event;
 };
 

@@ -2,6 +2,8 @@ import Conversation from "../models/Conversation";
 import Message from "../models/Message";
 import { AppError } from "../utils/AppError";
 import { HTTP_STATUS } from "../constants/httpStatus";
+import { createNotification } from "./notification.service";
+import { NotificationType } from "../models/Notification";
 
 export const sendMessage = async (
   senderId: string,
@@ -34,6 +36,14 @@ export const sendMessage = async (
   // 4. Update the conversation with the latest message for the inbox preview
   conversation.lastMessage = newMessage._id as any;
   await conversation.save();
+
+  // Notify the receiver about the new DM
+  await createNotification(
+    receiverId,
+    senderId,
+    NotificationType.MESSAGE,
+    newMessage._id.toString() as string,
+  );
 
   return newMessage;
 };

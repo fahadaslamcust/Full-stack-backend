@@ -1,6 +1,8 @@
 import User from "../models/User";
 import { AppError } from "../utils/AppError";
 import { HTTP_STATUS } from "../constants/httpStatus";
+import { createNotification } from "./notification.service";
+import { NotificationType } from "../models/Notification";
 
 export const followUser = async (
   currentUserId: string,
@@ -32,6 +34,14 @@ export const followUser = async (
   targetUser.followers.push(currentUserId as any);
 
   await Promise.all([currentUser.save(), targetUser.save()]);
+
+  // Notify the target user that they have a new follower
+  await createNotification(
+    targetUserId,
+    currentUserId,
+    NotificationType.FOLLOW,
+    currentUserId as any,
+  );
   return { success: true };
 };
 
