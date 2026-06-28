@@ -11,8 +11,13 @@ import postRoutes from "./routes/post.routes";
 import messageRoutes from "./routes/message.routes";
 import eventRoutes from "./routes/event.routes";
 import notificationRoutes from "./routes/notification.routes";
+import path from "path";
 
 const app = express();
+
+// When someone visits http://localhost:5000/uploads/avatars/..., it will look in the public folder
+app.use("/uploads", express.static(path.join(__dirname, "../public/uploads")));
+// --------------------------------
 
 // Global Middlewares
 app.use(cors());

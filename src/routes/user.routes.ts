@@ -5,6 +5,7 @@ import { updateProfileSchema, searchQuerySchema } from "../schemas/user.schema";
 
 import * as userController from "../controllers/user.controller";
 import * as connectionController from "../controllers/connection.controller";
+import { uploadAvatarMiddleware } from "../middlewares/upload.middleware";
 
 const router = Router();
 
@@ -16,6 +17,11 @@ router.put(
   "/me",
   validate(updateProfileSchema),
   userController.updateMyProfile,
+);
+router.put(
+  "/me/avatar",
+  uploadAvatarMiddleware.single("avatar"),
+  userController.uploadAvatar,
 );
 
 // Search must come before /:id route

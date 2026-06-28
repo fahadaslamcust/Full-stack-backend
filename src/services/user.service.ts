@@ -2,12 +2,26 @@ import User from "../models/User";
 import { AppError } from "../utils/AppError";
 import { HTTP_STATUS } from "../constants/httpStatus";
 import { UpdateProfileInput } from "../schemas/user.schema";
+import { ENV } from "../config/env";
 
 export const getUserById = async (userId: string) => {
   const user = await User.findById(userId).select("-password");
   if (!user) {
     throw new AppError("User not found", HTTP_STATUS.NOT_FOUND);
   }
+  return user;
+};
+
+export const updateAvatar = async (userId: string, filename: string) => {
+  const user = await User.findById(userId);
+  if (!user) throw new AppError("User not found", HTTP_STATUS.NOT_FOUND);
+
+  // Construct the URL to the image (In production, replace localhost with your actual domain)
+  const avatarUrl = `${ENV.FRONTEND_DOMAIN}/uploads/avatars/${filename}`;
+
+  user.avatar = avatarUrl;
+  await user.save();
+
   return user;
 };
 

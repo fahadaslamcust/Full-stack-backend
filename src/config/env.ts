@@ -4,7 +4,13 @@ import path from "path";
 // Locate the .env file at the project root
 dotenv.config({ path: path.join(__dirname, "../../.env") });
 
-const requiredEnv = ["PORT", "MONGO_URI", "JWT_SECRET", "NODE_ENV"] as const;
+const requiredEnv = [
+  "PORT",
+  "MONGO_URI",
+  "JWT_SECRET",
+  "NODE_ENV",
+  "FRONTEND_DOMAIN",
+] as const;
 
 // Verify every required variable exists
 for (const env of requiredEnv) {
@@ -19,4 +25,5 @@ export const ENV = {
   MONGO_URI: process.env.MONGO_URI!,
   JWT_SECRET: process.env.JWT_SECRET!,
   NODE_ENV: process.env.NODE_ENV || "development",
+  FRONTEND_DOMAIN: process.env.FRONTEND_DOMAIN,
 };
