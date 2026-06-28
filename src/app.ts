@@ -20,7 +20,14 @@ app.use("/uploads", express.static(path.join(__dirname, "../public/uploads")));
 // --------------------------------
 
 // Global Middlewares
-app.use(cors());
+app.use(
+  cors({
+    origin: "*", // Allow requests from any origin
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"], // Allow these HTTP methods
+    allowedHeaders: ["Content-Type", "Authorization"], // Allow these headers
+  }),
+);
+
 app.use(express.json()); // Allows Express to read incoming JSON data bodies
 
 // Health Check Route (To quickly confirm the server is running)
