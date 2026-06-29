@@ -35,3 +35,18 @@ export const login = async (
     next(error);
   }
 };
+
+export const verifyEmail = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const result = await authService.verifyEmail(
+      req.params.token.toString() as string,
+    );
+    res.status(HTTP_STATUS.OK).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
