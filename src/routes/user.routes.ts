@@ -30,11 +30,11 @@ router.get(
   validate(searchQuerySchema),
   userController.searchStudents,
 );
-router.get("/:id", userController.getStudentProfile);
-
 // Connection Routes
 router.get("/network/me", connectionController.getMyNetwork);
 router.post("/:targetId/follow", connectionController.followUser);
 router.delete("/:targetId/unfollow", connectionController.unfollowUser);
+
+router.get("/:id", userController.getStudentProfile);
 
 export default router;

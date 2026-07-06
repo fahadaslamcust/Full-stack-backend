@@ -41,3 +41,20 @@ export const uploadAvatarMiddleware = multer({
   limits: { fileSize: 2 * 1024 * 1024 }, // 2MB
   fileFilter: fileFilter,
 });
+
+const mediaStorage = multer.diskStorage({
+  destination: function (req: Request, file: Express.Multer.File, cb) {
+    cb(null, "public/uploads/avatars"); // Reuse the avatars folder for simplicity
+  },
+  filename: function (req: Request, file: Express.Multer.File, cb) {
+    const ext = path.extname(file.originalname);
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, `media-${uniqueSuffix}${ext}`);
+  },
+});
+
+export const uploadMediaMiddleware = multer({
+  storage: mediaStorage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  fileFilter: fileFilter,
+});

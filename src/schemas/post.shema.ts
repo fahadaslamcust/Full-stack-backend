@@ -6,6 +6,7 @@ export const createPostSchema = z.object({
       .string()
       .min(1, "Post content cannot be empty")
       .max(2000, "Post is too long"),
+    taggedUsers: z.any().optional(),
   }),
 });
 

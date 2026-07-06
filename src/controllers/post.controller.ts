@@ -9,7 +9,11 @@ export const createPost = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const post = await postService.createPost(req.user!.id, req.body);
+    const data = { ...req.body };
+    if (req.file) {
+      data.mediaUrl = `/uploads/avatars/${req.file.filename}`;
+    }
+    const post = await postService.createPost(req.user!.id, data);
     res.status(HTTP_STATUS.CREATED).json({ success: true, data: post });
   } catch (error) {
     next(error);

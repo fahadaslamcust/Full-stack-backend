@@ -4,6 +4,7 @@ import { AppError } from "../utils/AppError";
 import { HTTP_STATUS } from "../constants/httpStatus";
 import { createNotification } from "./notification.service";
 import { NotificationType } from "../models/Notification";
+import { getIO } from "../socket";
 
 export const sendMessage = async (
   senderId: string,
@@ -45,7 +46,14 @@ export const sendMessage = async (
     newMessage._id.toString() as string,
   );
 
-  return newMessage;
+  const populatedMessage = await newMessage.populate("sender", "name avatar profilePicture");
+
+  // Real-time socket emission
+  const io = getIO();
+  io.to(receiverId).emit("new_message", populatedMessage);
+  io.to(senderId).emit("new_message", populatedMessage);
+
+  return populatedMessage;
 };
 
 export const getMessages = async (userId: string, targetUserId: string) => {

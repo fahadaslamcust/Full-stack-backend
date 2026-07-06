@@ -1,6 +1,7 @@
 import app from "./app";
 import { ENV } from "./config/env";
 import { connectDB } from "./config/db";
+import { initSocket } from "./socket";
 
 const bootEngine = async () => {
   // 1. Establish connection to your MongoDB
@@ -12,6 +13,9 @@ const bootEngine = async () => {
       `🚀 Engine is live in [${ENV.NODE_ENV}] mode on port ${ENV.PORT}`,
     );
   });
+
+  // Initialize Socket.io
+  initSocket(server);
 
   // 3. Prevent sudden catastrophic server crashes
   process.on("unhandledRejection", (err: Error) => {

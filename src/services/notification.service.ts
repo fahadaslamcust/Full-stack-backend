@@ -1,6 +1,7 @@
 import Notification, { NotificationType } from "../models/Notification";
 import { AppError } from "../utils/AppError";
 import { HTTP_STATUS } from "../constants/httpStatus";
+import { getIO } from "../socket";
 
 // This is an internal function that your other controllers will call
 export const createNotification = async (
@@ -12,12 +13,18 @@ export const createNotification = async (
   // Don't notify a user about their own actions
   if (recipientId === senderId) return null;
 
-  return await Notification.create({
+  const notification = await Notification.create({
     recipient: recipientId,
     sender: senderId,
     type,
     entityId,
   });
+
+  const populatedNotification = await notification.populate("sender", "name avatar profilePicture");
+
+  getIO().to(recipientId).emit("new_notification", populatedNotification);
+
+  return populatedNotification;
 };
 
 export const getUserNotifications = async (

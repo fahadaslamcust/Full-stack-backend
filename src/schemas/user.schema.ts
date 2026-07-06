@@ -9,7 +9,7 @@ export const updateProfileSchema = z.object({
 
 export const searchQuerySchema = z.object({
   query: z.object({
-    name: z.string().min(1, "Search term is required"),
+    name: z.string().optional(),
   }),
 });
 

@@ -45,11 +45,10 @@ export const registerUser = async (data: RegisterInput) => {
     );
   }
 
-  // Notice we do NOT return a JWT token here anymore. They must verify first.
+  // TEMPORARILY MODIFIED FOR DEVELOPMENT: Return token to allow auto-login
   return {
-    success: true,
-    message:
-      "Registration successful. Please check your email to verify your account.",
+    user: { id: user._id, name: user.name, email: user.email },
+    token: signToken(user._id.toString() as string)
   };
 };
 
@@ -61,12 +60,13 @@ export const loginUser = async (data: LoginInput) => {
   }
 
   // ADD THIS BLOCK: Prevent login if email is not verified
-  if (!user.isEmailVerified) {
-    throw new AppError(
-      "Please verify your email address before logging in.",
-      HTTP_STATUS.FORBIDDEN,
-    );
-  }
+  // TEMPORARILY DISABLED FOR DEVELOPMENT:
+  // if (!user.isEmailVerified) {
+  //   throw new AppError(
+  //     "Please verify your email address before logging in.",
+  //     HTTP_STATUS.FORBIDDEN,
+  //   );
+  // }
 
   return {
     user: { id: user._id, name: user.name, email: user.email },

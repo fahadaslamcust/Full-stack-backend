@@ -37,10 +37,16 @@ export const updateProfile = async (
   return updatedUser;
 };
 
-export const searchUsersByName = async (searchTerm: string) => {
-  const users = await User.find({
+export const searchUsersByName = async (searchTerm: string = "", currentUserId?: string) => {
+  const query: any = {
     name: { $regex: searchTerm, $options: "i" },
-  })
+  };
+  
+  if (currentUserId) {
+    query._id = { $ne: currentUserId };
+  }
+
+  const users = await User.find(query)
     .select("name avatar bio")
     .limit(20); // Protects the database from massive queries
 

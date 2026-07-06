@@ -4,10 +4,20 @@ import { HTTP_STATUS } from "../constants/httpStatus";
 import { CreatePostInput, CreateCommentInput } from "../schemas/post.shema";
 import { createNotification } from "./notification.service";
 import { NotificationType } from "../models/Notification";
+import { getIO } from "../socket";
 
-export const createPost = async (userId: string, data: CreatePostInput) => {
-  const post = await Post.create({ author: userId, content: data.content });
-  return await post.populate("author", "name avatar");
+export const createPost = async (userId: string, data: CreatePostInput & { mediaUrl?: string; taggedUsers?: string[] }) => {
+  const post = await Post.create({ 
+    author: userId, 
+    content: data.content,
+    mediaUrl: data.mediaUrl,
+    taggedUsers: data.taggedUsers || []
+  });
+  const populatedPost = await post.populate("author", "name profilePicture");
+  
+  getIO().emit("new_post", populatedPost);
+
+  return populatedPost;
 };
 
 export const updatePost = async (
@@ -28,7 +38,11 @@ export const updatePost = async (
   post.content = content;
   post.isEdited = true; // Flag it as edited
   await post.save();
-  return post;
+  
+  const populatedPost = await post.populate("author", "name profilePicture");
+  getIO().emit("post_updated", populatedPost);
+
+  return populatedPost;
 };
 
 export const getFeed = async (page: number = 1, limit: number = 10) => {
@@ -37,14 +51,16 @@ export const getFeed = async (page: number = 1, limit: number = 10) => {
     .sort({ createdAt: -1 }) // Newest posts first
     .skip(skip)
     .limit(limit)
-    .populate("author", "name avatar")
-    .populate("comments.user", "name avatar");
+    .populate("author", "name profilePicture")
+    .populate("comments.user", "name profilePicture")
+    .populate("taggedUsers", "name profilePicture");
 };
 
 export const getPostById = async (postId: string) => {
   const post = await Post.findById(postId)
-    .populate("author", "name avatar")
-    .populate("comments.user", "name avatar");
+    .populate("author", "name profilePicture")
+    .populate("comments.user", "name profilePicture")
+    .populate("taggedUsers", "name profilePicture");
 
   if (!post) throw new AppError("Post not found", HTTP_STATUS.NOT_FOUND);
   return post;
@@ -91,7 +107,15 @@ export const toggleLike = async (postId: string, userId: string) => {
     post._id.toString() as string,
   );
 
-  return post;
+  const populatedPost = await post.populate([
+    { path: "author", select: "name profilePicture" },
+    { path: "comments.user", select: "name profilePicture" },
+    { path: "taggedUsers", select: "name profilePicture" }
+  ]);
+  
+  getIO().emit("post_updated", populatedPost);
+
+  return populatedPost;
 };
 
 export const addComment = async (
@@ -119,5 +143,13 @@ export const addComment = async (
   );
 
   // Return the post with the newly added user populated
-  return await post.populate("comments.user", "name avatar");
+  const populatedPost = await post.populate([
+    { path: "author", select: "name profilePicture" },
+    { path: "comments.user", select: "name profilePicture" },
+    { path: "taggedUsers", select: "name profilePicture" }
+  ]);
+
+  getIO().emit("post_updated", populatedPost);
+
+  return populatedPost;
 };

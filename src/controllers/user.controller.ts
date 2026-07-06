@@ -65,7 +65,8 @@ export const searchStudents = async (
 ): Promise<void> => {
   try {
     const searchTerm = req.query.name as string;
-    const students = await userService.searchUsersByName(searchTerm);
+    const currentUserId = req.user.id;
+    const students = await userService.searchUsersByName(searchTerm, currentUserId);
     res
       .status(HTTP_STATUS.OK)
       .json({ success: true, count: students.length, data: students });

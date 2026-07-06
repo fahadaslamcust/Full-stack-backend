@@ -11,6 +11,8 @@ export interface IPost extends Document {
   content: string;
   likes: Types.ObjectId[];
   comments: IComment[];
+  mediaUrl?: string;
+  taggedUsers: Types.ObjectId[];
   isEdited: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -28,6 +30,8 @@ const postSchema = new Schema<IPost>(
     content: { type: String, required: true, maxlength: 2000 },
     likes: [{ type: Schema.Types.ObjectId, ref: "User" }],
     comments: [commentSchema],
+    mediaUrl: { type: String },
+    taggedUsers: [{ type: Schema.Types.ObjectId, ref: "User" }],
     isEdited: { type: Boolean, default: false },
   },
   { timestamps: true },

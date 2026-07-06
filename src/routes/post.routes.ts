@@ -1,6 +1,7 @@
 import { Router } from "express";
 import * as postController from "../controllers/post.controller";
 import { protect } from "../middlewares/auth.middleware";
+import { uploadMediaMiddleware } from "../middlewares/upload.middleware";
 import { validate } from "../middlewares/validate.middleware";
 import {
   createPostSchema,
@@ -16,7 +17,11 @@ router.use(protect);
 // Routes grouped by path
 router
   .route("/")
-  .post(validate(createPostSchema), postController.createPost)
+  .post(
+    uploadMediaMiddleware.single("media"),
+    validate(createPostSchema),
+    postController.createPost
+  )
   .get(postController.getFeed);
 
 router
