@@ -6,9 +6,47 @@ import jwt from "jsonwebtoken";
 import { ENV } from "../config/env";
 import { RegisterInput, LoginInput } from "../schemas/auth.schema";
 import { sendEmail } from "../utils/sendEmail";
-
+import * as googleAuth from './google-auth.service';
 const signToken = (id: string): string => {
   return jwt.sign({ id }, ENV.JWT_SECRET, { expiresIn: "1d" });
+};
+export const googleSignUp = async (googleToken: string) => {
+  try {
+    // Verify the Google token
+    const googleData = await googleAuth.verifyGoogleToken(googleToken);
+    
+    // Check if user already exists
+    let user = await User.findOne({ email: googleData.email });
+    
+    if (!user) {
+      // Create new user if doesn't exist
+      user = new User({
+        email: googleData.email,
+        name: googleData.name,
+        avatar: googleData.picture,
+        password: 'google_oauth', // Placeholder - Google users don't have passwords
+      });
+      await user.save();
+    }
+    
+    // Generate JWT token
+    const jwtToken = jwt.sign(
+  { userId: user._id },
+  ENV.JWT_SECRET,
+  { expiresIn: '7d' }
+);
+    return {
+      token: jwtToken,
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        avatar: user.avatar,
+      },
+    };
+  } catch (error) {
+    throw error;
+  }
 };
 export const registerUser = async (data: RegisterInput) => {
   const existingUser = await User.findOne({ email: data.email });

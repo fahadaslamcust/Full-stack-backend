@@ -1,6 +1,30 @@
 import { Request, Response, NextFunction } from "express";
 import * as authService from "../services/auth.service";
 import { HTTP_STATUS } from "../constants/httpStatus";
+import { AppError } from "../utils/AppError";
+
+export const googleAuth = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const { token } = req.body;
+    
+    if (!token) {
+      throw new AppError('Google token is required', HTTP_STATUS.BAD_REQUEST);
+    }
+    
+    const result = await authService.googleSignUp(token);
+    res.status(HTTP_STATUS.OK).json({
+      success: true,
+      message: "Google authentication successful",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const register = async (
   req: Request,
