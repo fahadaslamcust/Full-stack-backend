@@ -31,10 +31,10 @@ export const googleSignUp = async (googleToken: string) => {
     
     // Generate JWT token
     const jwtToken = jwt.sign(
-  { userId: user._id },
-  ENV.JWT_SECRET,
-  { expiresIn: '7d' }
-);
+      { id: user._id },
+      ENV.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
     return {
       token: jwtToken,
       user: {
