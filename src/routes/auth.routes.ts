@@ -14,8 +14,8 @@ router.post("/login", validate(loginSchema), authController.login);
 // POST /api/v1/auth/verify-email
 router.get("/verify-email/:token", authController.verifyEmail);
 
-// NEW: Google OAuth route
 router.post("/google", authController.googleAuth);
+router.post("/facebook", authController.facebookAuth);
 
 export default router;
 

@@ -6,10 +6,45 @@ import jwt from "jsonwebtoken";
 import { ENV } from "../config/env";
 import { RegisterInput, LoginInput } from "../schemas/auth.schema";
 import { sendEmail } from "../utils/sendEmail";
-import * as googleAuth from './google-auth.service';
+import * as googleAuth from "./google-auth.service";
+import * as facebookAuth from "./facebook-auth.service";
 const signToken = (id: string): string => {
   return jwt.sign({ id }, ENV.JWT_SECRET, { expiresIn: "1d" });
 };
+export const facebookSignUp = async (facebookToken: string) => {
+  try {
+    const facebookData = await facebookAuth.verifyFacebookToken(facebookToken);
+
+    let user = await User.findOne({ email: facebookData.email });
+
+    if (!user) {
+      user = new User({
+        email: facebookData.email,
+        name: facebookData.name,
+        avatar: facebookData.picture,
+        password: "facebook_oauth",
+      });
+      await user.save();
+    }
+
+    const jwtToken = jwt.sign({ id: user._id }, ENV.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    return {
+      token: jwtToken,
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        avatar: user.avatar,
+      },
+    };
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const googleSignUp = async (googleToken: string) => {
   try {
     // Verify the Google token

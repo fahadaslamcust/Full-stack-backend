@@ -3,6 +3,29 @@ import * as authService from "../services/auth.service";
 import { HTTP_STATUS } from "../constants/httpStatus";
 import { AppError } from "../utils/AppError";
 
+export const facebookAuth = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const { token } = req.body;
+
+    if (!token) {
+      throw new AppError("Facebook token is required", HTTP_STATUS.BAD_REQUEST);
+    }
+
+    const result = await authService.facebookSignUp(token);
+    res.status(HTTP_STATUS.OK).json({
+      success: true,
+      message: "Facebook authentication successful",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const googleAuth = async (
   req: Request,
   res: Response,
